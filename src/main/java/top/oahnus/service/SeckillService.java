@@ -1,7 +1,7 @@
 package top.oahnus.service;
 
-import top.oahnus.dto.Exporter;
-import top.oahnus.dto.SeckillResult;
+import top.oahnus.dto.Exposer;
+import top.oahnus.dto.SeckillExection;
 import top.oahnus.entity.Seckill;
 import top.oahnus.exception.RepeatException;
 import top.oahnus.exception.SeckillException;
@@ -30,7 +30,7 @@ public interface SeckillService {
      * 秒杀开启时输出秒杀接口的地址
      * @param seckillId
      */
-    Exporter exportSecKillUrl(long seckillId);
+    Exposer exposeSecKillUrl(long seckillId);
 
     /**
      * 执行秒杀
@@ -38,6 +38,6 @@ public interface SeckillService {
      * @param userPhone
      * @param md5
      */
-    SeckillResult executeSecKill(long seckillId, long userPhone, String md5)
+    SeckillExection executeSecKill(long seckillId, long userPhone, String md5)
     throws SeckillException,RepeatException,SeckillException;
 }

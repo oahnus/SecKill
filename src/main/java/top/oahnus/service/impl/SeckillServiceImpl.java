@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import top.oahnus.dao.SeckillDao;
 import top.oahnus.dao.SuccessKilledDao;
-import top.oahnus.dto.Exporter;
-import top.oahnus.dto.SeckillResult;
+import top.oahnus.dto.Exposer;
+import top.oahnus.dto.SeckillExection;
 import top.oahnus.entity.Seckill;
 import top.oahnus.entity.SuccessKilled;
 import top.oahnus.enums.SeckillStateEnum;
@@ -49,11 +49,11 @@ public class SeckillServiceImpl implements SeckillService {
      * @param seckillId 秒杀商品id
      * @return 导出dto类
      */
-    public Exporter exportSecKillUrl(long seckillId) {
+    public Exposer exposeSecKillUrl(long seckillId) {
         Seckill seckill = seckillDao.queryById(seckillId);
 
         if(seckill == null){
-            return new Exporter(false,seckillId);
+            return new Exposer(false,seckillId);
         }
 
         Date startTime = seckill.getStartTime();
@@ -61,11 +61,11 @@ public class SeckillServiceImpl implements SeckillService {
         Date nowTime = new Date();
 
         if(nowTime.getTime() <startTime.getTime()|| nowTime.getTime()>endTime.getTime()){
-            return new Exporter(false,seckillId,nowTime.getTime(),startTime.getTime(),endTime.getTime());
+            return new Exposer(false,seckillId,nowTime.getTime(),startTime.getTime(),endTime.getTime());
         }
 
         String md5 = getMD5(seckillId);
-        return new Exporter(true,md5,seckillId);
+        return new Exposer(true,md5,seckillId);
     }
 
     /**
@@ -86,7 +86,7 @@ public class SeckillServiceImpl implements SeckillService {
      * 3. 不是所有的方法都需要事务操作，只有一条修改操作不需要事务控制
      * 4.
      */
-    public SeckillResult executeSecKill(long seckillId, long userPhone, String md5) throws SeckillException, RepeatException, SeckillException {
+    public SeckillExection executeSecKill(long seckillId, long userPhone, String md5) throws SeckillException, RepeatException, SeckillException {
         try {
             if (md5 == null || !md5.equals(getMD5(seckillId))) {
                 throw new SeckillException("seckill data rewrite");
@@ -102,7 +102,7 @@ public class SeckillServiceImpl implements SeckillService {
                     throw new RepeatException("repeat kill");
                 } else {
                     SuccessKilled successKilled = successKilledDao.queryByIdWithSecKill(seckillId, userPhone);
-                    return new SeckillResult(seckillId, SeckillStateEnum.SUCCESS,successKilled);
+                    return new SeckillExection(seckillId, SeckillStateEnum.SUCCESS,successKilled);
                 }
             }
         } catch (SeckillCloseException e){

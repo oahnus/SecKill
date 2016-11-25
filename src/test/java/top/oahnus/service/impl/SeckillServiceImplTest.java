@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import top.oahnus.dto.Exporter;
-import top.oahnus.dto.SeckillResult;
+import top.oahnus.dto.Exposer;
+import top.oahnus.dto.SeckillExection;
 import top.oahnus.entity.Seckill;
 import top.oahnus.exception.RepeatException;
 import top.oahnus.exception.SeckillCloseException;
@@ -45,13 +45,13 @@ public class SeckillServiceImplTest {
     @Test
     public void testSecKillLogic() throws Exception {
         long seckillId = 1000L;
-        Exporter exporter = seckillService.exportSecKillUrl(seckillId);
-        logger.info("exporter={}",exporter);
-        if(exporter.isExported()){
+        Exposer exposer = seckillService.exposeSecKillUrl(seckillId);
+        logger.info("exposer={}", exposer);
+        if(exposer.isExported()){
             try {
                 long userPhone = 12312312241L;
-                String md5 = exporter.getMd5();
-                SeckillResult result = seckillService.executeSecKill(seckillId,userPhone,md5);
+                String md5 = exposer.getMd5();
+                SeckillExection result = seckillService.executeSecKill(seckillId,userPhone,md5);
                 logger.info("result={}",result);
             }catch (RepeatException e){
                 logger.error(e.getMessage());
@@ -59,7 +59,7 @@ public class SeckillServiceImplTest {
                 logger.error(e.getMessage());
             }
         }else{
-            logger.warn("秒杀未开启exporter={}",exporter);
+            logger.warn("秒杀未开启exporter={}", exposer);
         }
     }
     /**
@@ -84,6 +84,6 @@ public class SeckillServiceImplTest {
      21:53:29.179 [main] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49c66ade]
      21:53:29.179 [main] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49c66ade]
      21:53:29.179 [main] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49c66ade]
-     21:53:29.358 [main] INFO  t.o.s.impl.SeckillServiceImplTest - result=SeckillResult{seckillId=1000, state=1, stateInfo='成功', successKilled=SuccessKilled{seckillId=1000, userPhone=12312312241, state=0, createTime=Thu Nov 24 21:53:29 CST 2016, seckill=Seckill{seckillId=1000, name='500元秒杀IPHONE', number=97, startTime=Thu Nov 24 21:53:29 CST 2016, endTime=Wed Nov 30 00:00:00 CST 2016, createTime=Thu Nov 24 14:33:25 CST 2016}}}
+     21:53:29.358 [main] INFO  t.o.s.impl.SeckillServiceImplTest - result=SeckillExection{seckillId=1000, state=1, stateInfo='成功', successKilled=SuccessKilled{seckillId=1000, userPhone=12312312241, state=0, createTime=Thu Nov 24 21:53:29 CST 2016, seckill=Seckill{seckillId=1000, name='500元秒杀IPHONE', number=97, startTime=Thu Nov 24 21:53:29 CST 2016, endTime=Wed Nov 30 00:00:00 CST 2016, createTime=Thu Nov 24 14:33:25 CST 2016}}}
      */
 }

@@ -3,7 +3,7 @@ package top.oahnus.dto;
 /**
  * Created by oahnus on 2016/11/24.
  */
-public class Exporter {
+public class Exposer {
     private boolean exported;
 
     private String md5;
@@ -17,25 +17,25 @@ public class Exporter {
     // 结束时间
     private long end;
 
-    public Exporter(boolean exported, String md5, long seckillId) {
+    public Exposer(boolean exported, String md5, long seckillId) {
         this.exported = exported;
         this.md5 = md5;
         this.seckillId = seckillId;
     }
 
-    public Exporter(boolean exported, long now, long start, long end) {
+    public Exposer(boolean exported, long now, long start, long end) {
         this.exported = exported;
         this.now = now;
         this.end = end;
         this.start = start;
     }
 
-    public Exporter(boolean exported, long seckillId) {
+    public Exposer(boolean exported, long seckillId) {
         this.exported = exported;
         this.seckillId = seckillId;
     }
 
-    public Exporter(boolean exported, long seckillId, long now, long start, long end) {
+    public Exposer(boolean exported, long seckillId, long now, long start, long end) {
         this.exported = exported;
         this.seckillId = seckillId;
         this.now = now;
@@ -93,7 +93,7 @@ public class Exporter {
 
     @Override
     public String toString() {
-        return "Exporter{" +
+        return "Exposer{" +
                 "exported=" + exported +
                 ", md5='" + md5 + '\'' +
                 ", seckillId=" + seckillId +
