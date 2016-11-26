@@ -17,7 +17,7 @@
     </select>
 
     <select id="queryAll" resultType="SecKill">
-        SELECT seckill_id ,name ,start_time ,end_time ,create_time
+        SELECT seckill_id ,name ,number ,start_time ,end_time ,create_time
         FROM seckill ORDER BY create_time DESC LIMIT #{offset},#{limit}
     </select>
 </mapper>
