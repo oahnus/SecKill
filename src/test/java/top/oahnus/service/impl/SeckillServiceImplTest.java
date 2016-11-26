@@ -44,12 +44,12 @@ public class SeckillServiceImplTest {
      */
     @Test
     public void testSecKillLogic() throws Exception {
-        long seckillId = 1000L;
+        long seckillId = 1002L;
         Exposer exposer = seckillService.exposeSecKillUrl(seckillId);
         logger.info("exposer={}", exposer);
-        if(exposer.isExported()){
+        if(exposer.isExposed()){
             try {
-                long userPhone = 12312312241L;
+                long userPhone = 15751774919L;
                 String md5 = exposer.getMd5();
                 SeckillExection result = seckillService.executeSecKill(seckillId,userPhone,md5);
                 logger.info("result={}",result);

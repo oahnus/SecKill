@@ -4,7 +4,7 @@ package top.oahnus.dto;
  * Created by oahnus on 2016/11/24.
  */
 public class Exposer {
-    private boolean exported;
+    private boolean exposed;
 
     private String md5;
 
@@ -17,38 +17,38 @@ public class Exposer {
     // 结束时间
     private long end;
 
-    public Exposer(boolean exported, String md5, long seckillId) {
-        this.exported = exported;
+    public Exposer(boolean exposed, String md5, long seckillId) {
+        this.exposed = exposed;
         this.md5 = md5;
         this.seckillId = seckillId;
     }
 
-    public Exposer(boolean exported, long now, long start, long end) {
-        this.exported = exported;
+    public Exposer(boolean exposed, long now, long start, long end) {
+        this.exposed = exposed;
         this.now = now;
         this.end = end;
         this.start = start;
     }
 
-    public Exposer(boolean exported, long seckillId) {
-        this.exported = exported;
+    public Exposer(boolean exposed, long seckillId) {
+        this.exposed = exposed;
         this.seckillId = seckillId;
     }
 
-    public Exposer(boolean exported, long seckillId, long now, long start, long end) {
-        this.exported = exported;
+    public Exposer(boolean exposed, long seckillId, long now, long start, long end) {
+        this.exposed = exposed;
         this.seckillId = seckillId;
         this.now = now;
         this.start = start;
         this.end = end;
     }
 
-    public boolean isExported() {
-        return exported;
+    public boolean isExposed() {
+        return exposed;
     }
 
-    public void setExported(boolean exported) {
-        this.exported = exported;
+    public void setExposed(boolean exposed) {
+        this.exposed = exposed;
     }
 
     public String getMd5() {
@@ -94,7 +94,7 @@ public class Exposer {
     @Override
     public String toString() {
         return "Exposer{" +
-                "exported=" + exported +
+                "exposed=" + exposed +
                 ", md5='" + md5 + '\'' +
                 ", seckillId=" + seckillId +
                 ", now=" + now +

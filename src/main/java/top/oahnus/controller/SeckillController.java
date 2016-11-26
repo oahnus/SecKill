@@ -75,7 +75,7 @@ public class SeckillController {
     @RequestMapping(value = "/{seckillId}/exposer",
             method = RequestMethod.POST,
             produces = {"application/json;charset=utf-8"})
-    public SeckillResult<Exposer> exposer(@PathVariable("exposer") Long seckillId){
+    public SeckillResult<Exposer> exposer(@PathVariable("seckillId") Long seckillId){
         SeckillResult<Exposer> result;
         try {
             Exposer exposer = seckillService.exposeSecKillUrl(seckillId);
@@ -101,7 +101,7 @@ public class SeckillController {
     public SeckillResult<SeckillExection> execute(
             @PathVariable("seckillId")Long seckillId,
             @PathVariable("md5") String md5,
-            @CookieValue(value = "userPhone",required = false) Long userPhone){
+            @CookieValue(value = "killPhone",required = false) Long userPhone){
         SeckillResult<SeckillExection> result;
         if(userPhone == null){
             return new SeckillResult<SeckillExection>(false,"未注册");
@@ -111,14 +111,14 @@ public class SeckillController {
             return new SeckillResult<SeckillExection>(true, exection);
         } catch (RepeatException e){
             SeckillExection exection = new SeckillExection(seckillId, SeckillStateEnum.REPEAT_KILL);
-            return new SeckillResult<SeckillExection>(false,exection);
+            return new SeckillResult<SeckillExection>(true,exection);
         } catch (SeckillCloseException e){
             SeckillExection exection = new SeckillExection(seckillId, SeckillStateEnum.END);
-            return new SeckillResult<SeckillExection>(false,exection);
+            return new SeckillResult<SeckillExection>(true,exection);
         } catch (Exception e){
             logger.error(e.getMessage(),e);
             SeckillExection exection = new SeckillExection(seckillId, SeckillStateEnum.INNER_ERROR);
-            return new SeckillResult<SeckillExection>(false,exection);
+            return new SeckillResult<SeckillExection>(true,exection);
         }
     }
 
