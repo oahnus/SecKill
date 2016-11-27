@@ -38,6 +38,19 @@ public class SeckillServiceImplTest {
         logger.info("secKill={}", seckillService.getById(1000L));
     }
 
+    @Test
+    public void testSeckillByProcedure(){
+        Exposer exposer = seckillService.exposeSecKillUrl(1002L);
+        String md5 = "";
+        long id = 1002;
+        long phone = 13413135487L;
+        if(exposer.isExposed()){
+            md5 = exposer.getMd5();
+        }
+        SeckillExection exection = seckillService.executeSecKillProcedure(id,phone,md5);
+        logger.info(exection.getStateInfo());
+    }
+
     /**
      * 测试代码逻辑
      * @throws Exception

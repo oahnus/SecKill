@@ -1,5 +1,6 @@
 package top.oahnus.service.impl;
 
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,9 @@ import top.oahnus.exception.SeckillException;
 import top.oahnus.service.SeckillService;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 /**
  * Created by oahnus on 2016/11/24.
  */
@@ -101,25 +103,25 @@ public class SeckillServiceImpl implements SeckillService {
      * 1. 可以达成一致约定
      * 2. 保证事务方法执行时间尽可能短，不要穿插其他HTTP/RPC网络操作，或者剥离到方法外部
      * 3. 不是所有的方法都需要事务操作，只有一条修改操作不需要事务控制
-     * 4.
      */
     public SeckillExection executeSecKill(long seckillId, long userPhone, String md5) throws SeckillException, RepeatException, SeckillException {
+        // 优化，先执行插入购买明细，再根据结果选择是否减库存
         try {
-            if (md5 == null || !md5.equals(getMD5(seckillId))) {
-                throw new SeckillException("seckill data rewrite");
-            }
-            // 减少商品数量
-            int updateNum = seckillDao.reduceNumber(seckillId, new Date());
-            if (updateNum != 1) {
-                throw new SeckillCloseException("seckill closed");
+            // 记录购买记录
+            int insertNum = successKilledDao.insertSuccessKilled(seckillId, userPhone);
+            if (insertNum == 0) {
+                throw new RepeatException("repeat kill");
             } else {
-                // 记录购买记录
-                int insertNum = successKilledDao.insertSuccessKilled(seckillId, userPhone);
-                if (insertNum == 0) {
-                    throw new RepeatException("repeat kill");
-                } else {
+                if (md5 == null || !md5.equals(getMD5(seckillId))) {
+                    throw new SeckillException("seckill data rewrite");
+                }
+                // 减库存
+                int updateNum = seckillDao.reduceNumber(seckillId, new Date());
+                if (updateNum != 1) {
+                    throw new SeckillCloseException("seckill closed");
+                }else {
                     SuccessKilled successKilled = successKilledDao.queryByIdWithSecKill(seckillId, userPhone);
-                    return new SeckillExection(seckillId, SeckillStateEnum.SUCCESS,successKilled);
+                    return new SeckillExection(seckillId, SeckillStateEnum.SUCCESS, successKilled);
                 }
             }
         } catch (SeckillCloseException e){
@@ -130,6 +132,33 @@ public class SeckillServiceImpl implements SeckillService {
             logger.info(e.getMessage(),e);
             // 拦截所有编译期异常，转化为运行期异常
             throw new SeckillException(e.getMessage());
+        }
+    }
+
+    public SeckillExection executeSecKillProcedure(long seckillId, long userPhone, String md5){
+        if(md5 == null || !md5.equals(getMD5(seckillId))){
+            return new SeckillExection(seckillId,SeckillStateEnum.DATA_REWRITE);
+        }
+        Date killTime = new Date();
+        Map<String,Object> paramMap = new HashMap<>();
+
+        paramMap.put("seckillId",seckillId);
+        paramMap.put("phone",userPhone);
+        paramMap.put("killTime",killTime);
+        paramMap.put("result",null);
+        try {
+            seckillDao.seckillByProcedure(paramMap);
+            Integer result = MapUtils.getInteger(paramMap,"result",-2);
+
+            if(result == 1){
+                SuccessKilled successKilled = successKilledDao.queryByIdWithSecKill(seckillId,userPhone);
+                return new SeckillExection(seckillId,SeckillStateEnum.SUCCESS);
+            }else{
+                return new SeckillExection(seckillId,SeckillStateEnum.stateOf(result));
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return new SeckillExection(seckillId,SeckillStateEnum.INNER_ERROR);
         }
     }
 
