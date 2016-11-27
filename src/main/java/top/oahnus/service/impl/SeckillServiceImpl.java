@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import top.oahnus.dao.SeckillDao;
 import top.oahnus.dao.SuccessKilledDao;
+import top.oahnus.dao.cache.RedisDao;
 import top.oahnus.dto.Exposer;
 import top.oahnus.dto.SeckillExection;
 import top.oahnus.entity.Seckill;
@@ -32,6 +33,9 @@ public class SeckillServiceImpl implements SeckillService {
     private SeckillDao seckillDao;
 
     @Autowired
+    private RedisDao redisDao;
+
+    @Autowired
     private SuccessKilledDao successKilledDao;
 
     private final String salt = "jsioei*jr33n:{<?}f23fa;";
@@ -49,11 +53,24 @@ public class SeckillServiceImpl implements SeckillService {
      * @param seckillId 秒杀商品id
      * @return 导出dto类
      */
+    // 使用redis优化秒杀ur暴露接口
     public Exposer exposeSecKillUrl(long seckillId) {
-        Seckill seckill = seckillDao.queryById(seckillId);
+        // 优化这一步访问数据库的操作，将此操作返回的数据缓存到redis
+        // 在超时基础上维护一致性
+        // 访问redis
+        Seckill seckill = redisDao.getSeckill(seckillId);
+        // 如果缓存没有，访问数据库
+        if(seckill == null) {
+            seckill = seckillDao.queryById(seckillId);
 
-        if(seckill == null){
-            return new Exposer(false,seckillId);
+            // 数据库中不存在，返回false
+            if(seckill == null){
+                return new Exposer(false,seckillId);
+            }
+            // 数据库中存在，放入redis
+            else{
+                String result = redisDao.putSeckill(seckill);
+            }
         }
 
         Date startTime = seckill.getStartTime();

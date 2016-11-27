@@ -44,7 +44,7 @@ public class SeckillServiceImplTest {
      */
     @Test
     public void testSecKillLogic() throws Exception {
-        long seckillId = 1002L;
+        long seckillId = 1003L;
         Exposer exposer = seckillService.exposeSecKillUrl(seckillId);
         logger.info("exposer={}", exposer);
         if(exposer.isExposed()){

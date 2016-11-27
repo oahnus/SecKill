@@ -45,4 +45,10 @@
         <!--给出扫描dao接口包-->
         <property name="basePackage" value="top.oahnus.dao"/>
     </bean>
+
+    <!-- 注入RedisDao -->
+    <bean id="redisDao" class="top.oahnus.dao.cache.RedisDao">
+        <constructor-arg index="0" value="localhost"/>
+        <constructor-arg index="1" value="6379"/>
+    </bean>
 </beans>
